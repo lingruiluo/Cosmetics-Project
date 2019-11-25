@@ -1,0 +1,225 @@
+---
+title: "EDAV Fall 2019 PSet 5, part A"
+author: "Final Project Group 20"
+output: html_document
+
+---
+```{r, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = TRUE)
+Sys.setenv("plotly_username"="luolingrui")
+Sys.setenv("plotly_api_key"="qfmhoO9BMEoLBNEOm3tI")
+```
+
+This assignment is designed to help you get started on the final project. Be sure to review the final project instructions (https://edav.info/project.html), in particular the new section on reproducible workflow (https://edav.info/project.html#reproducible-workflow), which summarizes principles that we've discussed in class.
+
+### 1. The Team
+
+[2 points]
+
+a) Who's on the team? (Include names and UNIs)
+
+**Lingrui Luo (ll3356), Zijing Wang (zw2619), Di Ye (dy2404), Qiaoge Zhu (qz2383).**
+
+
+b) How do you plan to divide up the work? (Grading is on a group basis. The point of asking is to encourage you to think about this.)
+
+**Lingrui Luo extract the ingredients from the ingredient column and perform related analysis. Zijing Wang analyzes the prices of the product and the relationship between price and brands. Di Ye summarizes the products for each skins types and analyzes the overall price differences. Qiaoge Zhu analyzes what ingredients make the product expensive and the differences of ingredients used to different types of skins.**
+
+
+### 2. The Questions
+
+[6 points]
+
+List three questions that you hope you will be able to answer from your research.
+
+**a) What chemical ingredients are used in the products with higher price and lower price respectively?**
+
+**b) What products to recommend based on their prices, ranks, brands and skin types?**
+
+**c) What are top 10 ingredients used for each types of skins?**
+
+### 3. Which output format do you plan to use to submit the project? 
+
+[2 points]
+
+(You don't have to use the same format for this assignment -- PSet 5, part A -- and the final project itself.)
+
+Choices are:
+
+pdf_document  
+
+html_document  
+
+bookdown book: https://bookdown.org/yihui/bookdown/
+
+shiny app: https://shiny.rstudio.com/  
+
+
+(Remember that it's ok to have pieces of the project that don't fit into the chosen output format; in those cases you can provide links to the relevant material.)
+
+**We are planning to use bookdown book for the project.**
+
+### 4. The Data
+
+What is your data source?  What is your method for importing data? Please be specific. Provide relevant information such as any obstacles you're encountering and what you plan to do to overcome them.
+
+[5 points]
+
+
+**The data source is: https://github.com/jjone36/Cosmetic/tree/master/data**
+
+We use the **read_csv** function in the `readr` package to read the data. For example, the following code reads one of the dataset we are going to use.
+
+```{r}
+library(readr)
+link <- "https://raw.githubusercontent.com/jjone36/Cosmetic/master/data/cosmetic_p.csv"
+data <- read_csv(url(link))
+```
+
+**One of the problems we are facing is that the name of some products are pretty long so they could be mixed up when we perform visualization. We have considered to use Cleveland dot plot to solve the problem.**
+
+**Also, the `ingredient` column contains data of strings, which is hard to perform analysis. We planned to use regular expression to extract the information contained. **
+
+
+### 5. Provide a short summary, including 2-3 graphs, of your initial investigations. 
+
+[10 points]
+
+```{r}
+head(data)
+library(dplyr)
+library(plotly)
+library(tidyverse)
+library(tidyr)
+library(ggplot2)
+library(parcoords)
+```
+
+```{r}
+combination <- data %>% filter(data$Combination==1) %>% 
+  select(Label, brand, name, price, rank) %>%
+  mutate(skin_type='Combination')
+dry <- data %>% filter(data$Dry==1) %>% 
+  select(Label, brand, name, price, rank) %>% 
+  mutate(skin_type='Dry')
+normal <- data %>% filter(data$Normal==1) %>% 
+  select(Label, brand, name, price, rank) %>% 
+  mutate(skin_type='Normal')
+oily <- data %>% filter(data$Oily==1) %>% 
+  select(Label, brand, name, price, rank) %>%
+  mutate(skin_type='Oily')
+sensitive <- data %>% filter(data$Sensitive==1) %>% 
+  select(Label, brand, name, price, rank) %>%
+  mutate(skin_type='Sensitive')
+```
+
+
+```{r}
+num_prod_df = data.frame(skin_type = c("Normal", "Combination", "Oily", "Dry", "Sensitive"), num_product = c(nrow(normal), nrow(combination), nrow(oily),nrow(dry),nrow(sensitive)))
+
+ggplot(data=num_prod_df, aes(x=skin_type, y=num_product)) +
+  geom_bar(stat="identity", width=0.5, fill = "#FF6666") + ggtitle("Number of Products for Each Skin Type") + xlab("Skin Type") + ylab("Number of Products")
+```
+
+There are most of products for the combination skin type while there are least for sensitive skin type. 
+
+- Average prices by Label for each skin type
+
+```{r}
+pc <- combination %>% group_by(Label) %>% summarise(avg_price = sum(price)/n())
+pd <- dry %>% group_by(Label) %>% summarise(avg_price = sum(price)/n())
+pn <- normal %>% group_by(Label) %>% summarise(avg_price = sum(price)/n())
+po <- oily %>% group_by(Label) %>% summarise(avg_price = sum(price)/n())
+ps <- sensitive %>% group_by(Label) %>% summarise(avg_price = sum(price)/n())
+```
+
+```{r}
+avg_price_label <- Reduce(function(x,y) merge(x,y,all=TRUE),
+                         list(pc%>%rename(c_price=avg_price),
+                              pd%>%rename(d_price=avg_price),
+                              pn%>%rename(n_price=avg_price),
+                              po%>%rename(o_price=avg_price),
+                              ps%>%rename(s_price=avg_price)))
+```
+
+```{r}
+avg_price_label %>%
+  parcoords(rowname=F,
+            brushMode = '1D-axes',
+            reorderable = T,
+            queue = T,
+            alpha = 0.5,
+            color = list(
+              colorBy='Label',
+              colorScale = 'scaleOrdinal',
+              colorScheme = 'schemeCategory10'),
+            withD3 = TRUE
+  )
+```
+
+From the parallel coordinate plot, we can see that the prices for treatment products of all skin type are averagly highest while the prices for cleanser are the lowest. 
+
+- Top 5 Brands with highest average prices for each skin type 
+
+```{r}
+top5_pc <- combination %>% group_by(brand) %>% summarise(brand_price = sum(price)/n()) %>% arrange(-brand_price) %>% head(5)
+top5_pd <- dry %>% group_by(brand) %>% summarise(brand_price = sum(price)/n()) %>% arrange(-brand_price) %>% head(5)
+top5_pn <- normal %>% group_by(brand) %>% summarise(brand_price = sum(price)/n()) %>% arrange(-brand_price) %>% head(5)
+top5_po <- oily %>% group_by(brand) %>% summarise(brand_price = sum(price)/n()) %>% arrange(-brand_price) %>% head(5)
+top5_ps <- sensitive %>% group_by(brand) %>% summarise(brand_price = sum(price)/n()) %>% arrange(-brand_price) %>% head(5)
+```
+
+```{r}
+top5_price <- rbind(top5_pc %>% mutate(skin_type = "combination"),
+                    top5_pd %>% mutate(skin_type = "dry"),
+                    top5_pn %>% mutate(skin_type = "normal"),
+                    top5_po %>% mutate(skin_type = "oily"),
+                    top5_ps %>% mutate(skin_type = "sensitive"))
+```
+
+```{r fig.width=6,fig.height=6}
+top5_price %>%
+  ggplot(aes(x=skin_type,y=brand_price,fill=skin_type)) +
+  geom_bar(stat = "identity") + 
+  coord_flip() +
+  facet_wrap(~ brand,ncol=2) +
+  xlab("Brand Average Price") +
+  ylab("Skin Type") +
+  ggtitle("Top 5 Brand with Highest Average Price for Each Skin Type ")
+```
+
+SK-II focuses on products for all five skin types, and their prices are averagely high. Comparing to other brands, LA Mer sets its prices at highest level. 
+
+- Interactive Plot for each brand with its average price and rank
+
+```{r}
+d <- rbind(combination, dry, normal, oily, sensitive) 
+brand <- d %>% group_by(brand) %>% summarise(avg_price = sum(price)/n(),avg_rank = sum(rank)/n())
+```
+
+```{r}
+avg_brand <- plot_ly(brand,
+                     x=~avg_rank,
+                     y=~avg_price,
+                     type='scatter',
+                     mode='markers',
+                     size=~avg_price,
+                     text = ~paste("Brand: ", brand,
+                                    '\nRank: ',round(avg_rank,1),
+                                    "\nPrice: ",round(avg_price,2)),
+                     hoverinfo = 'text') %>%
+  layout(
+    title = "Average Price vs Average Rank for each Brand",
+    xaxis = list(title="Average Rank"),
+    yaxis = list(title="Average Price"))
+#p_brand_link = api_create(avg_brand, filename="scatter2d-price_rank_brand")
+#p_brand_link
+avg_brand
+```
+
+The interactive scatter plot above demonstrates the average rank and the average price for each brand. There seem to be one outlier of brand "DERMAFLASH" whose rank is 0, which might be due to the missing information of ranking.    
+There is no evident relationship betwen the price and the rank of brands, since the brand with lower price can have higher ranking. 
+
+
+
+
