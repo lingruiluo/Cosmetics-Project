@@ -1,6 +1,6 @@
 --- 
 title: "name"
-author: "Yihui Xie"
+author: "Lingrui Luo (ll3356), Zijing Wang (zw2619), Di Ye (dy2404), Qiaoge Zhu (qz2383)"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 output: bookdown::gitbook
@@ -8,31 +8,101 @@ documentclass: book
 # bibliography: [book.bib, packages.bib]
 biblio-style: apalike
 link-citations: yes
-github-repo: rstudio/bookdown-demo
-description: "This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook."
+# github-repo: rstudio/bookdown-demo
+# description: "This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook."
 ---
 
-# Prerequisites
-
-This is a _sample_ book written in **Markdown**. You can use anything that Pandoc's Markdown supports, e.g., a math equation $a^2 + b^2 = c^2$.
-
-The **bookdown** package can be installed from CRAN or Github:
-
-```{r eval=FALSE}
-# install.packages("bookdown")
-# or the development version
-# devtools::install_github("rstudio/bookdown")
-```
-
-Remember each Rmd file contains one and only one chapter, and a chapter is defined by the first-level heading `#`.
-
-To compile this example to PDF, you need XeLaTeX. You are recommended to install TinyTeX (which includes XeLaTeX): <https://yihui.name/tinytex/>.
-
-```{r include=FALSE}
-# automatically create a bib database for R packages
-knitr::write_bib(c(
-  .packages(), 'bookdown', 'knitr', 'rmarkdown'
-), 'packages.bib')
-```
-
 # Introduction
+
+It is always hard to choose what exact cosmetic product do you want and is suitable for you, so we are here to help! This book analyzes 1472 product of 6 types and 116 brands, You can easily get the information you want on the products you are interested in and compare them to other products. We also provide recommendations for you based on information you provided. Let's get started!^[The data is found in https://github.com/jjone36/Cosmetic/tree/master/data]
+
+```{r, echo = FALSE, message = FALSE, include = FALSE}
+#librarys
+library(readr)
+library(dplyr)
+library(plotly)
+library(tidyverse)
+library(tidyr)
+library(ggplot2)
+library(parcoords)
+library(readr)
+```
+
+```{r, echo = FALSE, message = FALSE}
+link <- "https://raw.githubusercontent.com/jjone36/Cosmetic/master/data/cosmetic_p.csv"
+data <- read_csv(url(link))
+```
+
+# Top Ingredients
+
+
+# Skin Type
+
+## Number of Product for Each Skin Type
+
+```{r, echo = FALSE}
+# data for each skin type
+combination <- data %>% filter(data$Combination==1) %>% 
+  select(Label, brand, name, price, rank) %>%
+  mutate(skin_type='Combination')
+
+dry <- data %>% filter(data$Dry==1) %>% 
+  select(Label, brand, name, price, rank) %>% 
+  mutate(skin_type='Dry')
+
+normal <- data %>% filter(data$Normal==1) %>% 
+  select(Label, brand, name, price, rank) %>% 
+  mutate(skin_type='Normal')
+
+oily <- data %>% filter(data$Oily==1) %>% 
+  select(Label, brand, name, price, rank) %>%
+  mutate(skin_type='Oily')
+
+sensitive <- data %>% filter(data$Sensitive==1) %>% 
+  select(Label, brand, name, price, rank) %>%
+  mutate(skin_type='Sensitive')
+```
+
+```{r, echo = FALSE}
+num_prod_df = data.frame(skin_type = c("Normal", "Combination", "Oily", "Dry", "Sensitive"), num_product = c(nrow(normal), nrow(combination), nrow(oily),nrow(dry),nrow(sensitive)))
+
+ggplot(data=num_prod_df, aes(x=skin_type, y=num_product)) +
+  geom_bar(stat="identity", width=0.5, fill = "#FF6666") + ggtitle("Number of Products for Each Skin Type") + xlab("Skin Type") + ylab("Number of Products")
+```
+
+There are most of products for the combination skin type while there are least for sensitive skin type.
+
+To do: Add description of the plot
+
+## Price Differences for Each Skin Type
+
+# Price vs. Rank
+
+```{r, echo = FALSE}
+d <- rbind(combination, dry, normal, oily, sensitive) 
+brand <- d %>% group_by(brand) %>% summarise(avg_price = sum(price)/n(),avg_rank = sum(rank)/n())
+```
+
+```{r, echo = FALSE}
+avg_brand <- plot_ly(brand,
+                     x=~avg_rank,
+                     y=~avg_price,
+                     type='scatter',
+                     mode='markers',
+                     size=~avg_price,
+                     text = ~paste("Brand: ", brand,
+                                    '\nRank: ',round(avg_rank,1),
+                                    "\nPrice: ",round(avg_price,2)),
+                     hoverinfo = 'text') %>%
+  layout(
+    title = "Average Price vs Average Rank for each Brand",
+    xaxis = list(title="Average Rank"),
+    yaxis = list(title="Average Price"))
+#p_brand_link = api_create(avg_brand, filename="scatter2d-price_rank_brand")
+#p_brand_link
+avg_brand
+```
+
+
+# Product Recommendation
+
