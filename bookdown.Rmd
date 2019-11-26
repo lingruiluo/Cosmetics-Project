@@ -45,14 +45,16 @@ c) What are top 10 ingredients used for each types of skins?
 
 # Top Ingredients
 
-We try to figure out the top 10 chemical ingredients in cosmetics with low, medium, and high price. We rank the ingredients by their frequencies. If two chemical ingredients have same frequencies, we rank them by alphabetical order.
+We try to figure out the top 10 chemical ingredients in cosmetics with low, medium, and high price. We rank the ingredients by their frequencies. If two chemical ingredients have same frequencies, we rank them by alphabetical order. We classify the price lower than the median as low price, the price greater than median but lower than 75% quantile as medium price, the price greater than 75% quantile as high price.
+
+Products with high prices use Glycerin the most, as glycerin attracts water to itself. It helps to leave your skin with an overall moisturizing and smoothing effect.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
 ingredients_func <- function(data, n) {
   ingredients <- data$ingredients
   ingredients <- strsplit(ingredients, ", ")
-  unlist_ingredients <- factor(unlist(ingredients))
-  unique_ingredients_count <- length(unique(unlist_ingredients))
+  unlist_ingredients <- factor(trimws(unlist(ingredients)))
+  # unique_ingredients_count <- length(unique(unlist_ingredients))
   df <- tibble(ingredients = unlist_ingredients)
   return(df %>% 
     count(ingredients) %>% 
@@ -83,12 +85,34 @@ df <- df_all %>% rename(OverallIngredients = ingredients) %>% select(-times) %>%
 knitr::kable(df)
 ```
 
+Among the top 100 chemical ingredients, we want to find out what the most commonly used unique ingredients in products with low, medium, and high price are.  
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+n <- 100
+df_low <- ingredients_func(low_data, n) %>% slice(1:n)
+df_medium <- ingredients_func(medium_data, n) %>% slice(1:n)
+df_high <- ingredients_func(high_data, n) %>% slice(1:n)
+
+low_unique_ingredients <- setdiff(df_low$ingredients, union(df_medium$ingredients, df_high$ingredients))
+medium_unique_ingredients <- setdiff(df_medium$ingredients, union(df_low$ingredients, df_high$ingredients))
+high_unique_ingredients <- setdiff(df_high$ingredients, union(df_low$ingredients, df_medium$ingredients))
+```
+
+```{r echo=FALSE}
+low_unique_ingredients
+medium_unique_ingredients
+high_unique_ingredients
+```
+
 
 # Skin Type
 
 ## Number of Product for Each Skin Type
 
 ```{r, echo = FALSE}
+# link <- "https://raw.githubusercontent.com/jjone36/Cosmetic/master/data/cosmetic_p.csv"
+# data <- read_csv(url(link))
+
 # data for each skin type
 combination <- data %>% filter(data$Combination==1) %>% 
   select(Label, brand, name, price, rank) %>%
