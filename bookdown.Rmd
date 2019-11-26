@@ -45,6 +45,9 @@ c) What are top 10 ingredients used for each types of skins?
 
 # Top Ingredients
 
+We need to get a sense of what chemical ingredients are used in our daily-used products before making a selection. We make comparisons between products labeled with different price and designed for different skin types.
+
+## Top 10 Ingredient Rank
 We try to figure out the top 10 chemical ingredients in cosmetics with low, medium, and high price. We rank the ingredients by their frequencies. If two chemical ingredients have same frequencies, we rank them by alphabetical order. We classify the price lower than the median as low price, the price greater than median but lower than 75% quantile as medium price, the price greater than 75% quantile as high price.
 
 Products with high prices use Glycerin the most, as glycerin attracts water to itself. It helps to leave your skin with an overall moisturizing and smoothing effect.
@@ -58,7 +61,7 @@ ingredients_func <- function(data, n) {
   df <- tibble(ingredients = unlist_ingredients)
   return(df %>% 
     count(ingredients) %>% 
-    mutate(Rank = row_number(-n)) %>%
+    mutate(Top = row_number(-n)) %>%
     arrange(desc(n)) %>% 
     rename(times = n))
 }
@@ -81,12 +84,15 @@ df <- df_all %>% rename(OverallIngredients = ingredients) %>% select(-times) %>%
                  inner_join(df_low %>% rename(LowPriceIngredients = ingredients) %>% select(-times)) %>% 
                  inner_join(df_medium %>% rename(MediumPriceIngredients = ingredients) %>% select(-times)) %>% 
                  inner_join(df_high %>% rename(HighPriceIngredients = ingredients) %>% select(-times)) %>% 
-                 select(Rank, everything())
+                 select(Top, everything())
 knitr::kable(df)
 ```
 
+## Unique Ingredients in Products
+
 Among the top 100 chemical ingredients, we want to find out what the most commonly used unique ingredients in products with low, medium, and high price are.  
 
+![Ingredient Venn Diagram](ingredients_venn_diagramm.png)
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
 n <- 100
 df_low <- ingredients_func(low_data, n) %>% slice(1:n)
@@ -102,6 +108,69 @@ high_unique_ingredients <- setdiff(df_high$ingredients, union(df_low$ingredients
 low_unique_ingredients
 medium_unique_ingredients
 high_unique_ingredients
+```
+
+
+```{r eval=FALSE, include=FALSE}
+library(VennDiagram)
+library(RColorBrewer)
+# Chart
+# reference: https://www.r-graph-gallery.com/14-venn-diagramm.html
+myCol <- brewer.pal(3, "Pastel2")
+venn.diagram(
+  x = list(df_low$ingredients, df_medium$ingredients, df_high$ingredients),
+  category.names = c("Low Price" , "Medium Price" , "High Price"),
+  filename = 'ingredients_venn_diagramm.png',
+  output=TRUE,
+  
+  imagetype="png" ,
+  height = 650 , 
+  width = 650 , 
+  resolution = 300,
+  compression = "lzw",
+  
+  # Circles
+  lwd = 2,
+  lty = 'blank',
+  fill = myCol,
+  
+  # Numbers
+  cex = .6,
+  fontface = "bold",
+  fontfamily = "sans",
+  
+  # Set names
+  cat.cex = 0.6,
+  cat.fontface = "bold",
+  cat.default.pos = "outer",
+  cat.pos = c(-27, 27, 135),
+  cat.dist = c(0.055, 0.055, 0.085),
+  cat.fontfamily = "sans",
+  rotation = 1
+)
+```
+
+```{r}
+# need to fix
+combination <- data %>% filter(data$Combination==1) %>% 
+  select(ingredients) %>%
+  mutate(skin_type='Combination')
+
+dry <- data %>% filter(data$Dry==1) %>% 
+  select(ingredients) %>%
+  mutate(skin_type='Dry')
+
+normal <- data %>% filter(data$Normal==1) %>% 
+  select(ingredients) %>%
+  mutate(skin_type='Normal')
+
+oily <- data %>% filter(data$Oily==1) %>% 
+  select(ingredients) %>%
+  mutate(skin_type='Oily')
+
+sensitive <- data %>% filter(data$Sensitive==1) %>% 
+  select(ingredients) %>%
+  mutate(skin_type='Sensitive')
 ```
 
 
