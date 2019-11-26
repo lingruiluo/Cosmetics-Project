@@ -45,6 +45,44 @@ c) What are top 10 ingredients used for each types of skins?
 
 # Top Ingredients
 
+We try to figure out the top 10 chemical ingredients in cosmetics with low, medium, and high price. We rank the ingredients by their frequencies. If two chemical ingredients have same frequencies, we rank them by alphabetical order.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+ingredients_func <- function(data, n) {
+  ingredients <- data$ingredients
+  ingredients <- strsplit(ingredients, ", ")
+  unlist_ingredients <- factor(unlist(ingredients))
+  unique_ingredients_count <- length(unique(unlist_ingredients))
+  df <- tibble(ingredients = unlist_ingredients)
+  return(df %>% 
+    count(ingredients) %>% 
+    mutate(Rank = row_number(-n)) %>%
+    arrange(desc(n)) %>% 
+    rename(times = n))
+}
+
+## yet to decide
+summary(data$price)
+low_price <- summary(data$price)[3]
+medium_price <- summary(data$price)[4]
+low_data <- data %>% filter(price <= low_price) %>% select(ingredients)
+medium_data <- data %>% filter(price <= medium_price & price > low_price) %>% select(ingredients)
+high_data <- data %>% filter(price > medium_price) %>% select(ingredients)
+
+n <- 10
+df_all <- ingredients_func(data, n) %>% slice(1:n)
+df_low <- ingredients_func(low_data, n) %>% slice(1:n)
+df_medium <- ingredients_func(medium_data, n) %>% slice(1:n)
+df_high <- ingredients_func(high_data, n) %>% slice(1:n)
+
+df <- df_all %>% rename(OverallIngredients = ingredients) %>% select(-times) %>% 
+                 inner_join(df_low %>% rename(LowPriceIngredients = ingredients) %>% select(-times)) %>% 
+                 inner_join(df_medium %>% rename(MediumPriceIngredients = ingredients) %>% select(-times)) %>% 
+                 inner_join(df_high %>% rename(HighPriceIngredients = ingredients) %>% select(-times)) %>% 
+                 select(Rank, everything())
+knitr::kable(df)
+```
+
 
 # Skin Type
 
