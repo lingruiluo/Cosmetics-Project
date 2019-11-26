@@ -33,6 +33,16 @@ link <- "https://raw.githubusercontent.com/jjone36/Cosmetic/master/data/cosmetic
 data <- read_csv(url(link))
 ```
 
+We are hoping to answer the following 3 questions:
+
+a) What chemical ingredients are used in the products with higher price and lower price respectively?
+
+b) What products to recommend based on their prices, ranks, brands and skin types?
+
+c) What are top 10 ingredients used for each types of skins?
+
+
+
 # Top Ingredients
 
 
