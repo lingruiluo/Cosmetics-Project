@@ -296,13 +296,75 @@ avg_brand
 
 
 # Product Recommendation
+
+
+
 <p> Choose the features of products you want, we will make recommendations for you!</p>
-<select>
-  <option value="o1">Moisturizer</option>
-  <option value="o2">Cleanser</option>
-  <option value="o3">Treatment</option>
-  <option value="o4">Face Mask</option>
-  <option value="o4">Eye Cream</option>
-  <option value="o4">Sun Protect</option>
+<!-- Products dropdown menu -->
+<select id = "products">
+  <option value = "product_select">Select product</option>
+  <option value = "product_m">Moisturizer</option>
+  <option value = "product_c">Cleanser</option>
+  <option value = "product_t">Treatment</option>
+  <option value = "product_f">Face Mask</option>
+  <option value = "product_e">Eye Cream</option>
+  <option value = "product_s">Sun Protect</option>
 </select>
+<!-- Skin type dropdown menu -->
+<select class = "skin_types">
+  <option value = "skin_select">Select skin</option>
+  <option value = "skin_c">Combination</option>
+  <option value = "skin_d">Dry</option>
+  <option value = "skin_n">Normal</option>
+  <option value = "skin_o">Oily</option>
+  <option value = "skin_s">Sensitive</option>
+</select>
+<!-- Rank dropdown menu -->
+<select class = "skin_types">
+  <option value = "skin_c">Combination</option>
+  <option value = "skin_d">Dry</option>
+  <option value = "skin_n">Normal</option>
+  <option value = "skin_o">Oily</option>
+  <option value = "skin_s">Sensitive</option>
+</select>
+<!-- Price dropdown menu -->
+<select class = "skin_types">
+  <option value = "skin_c">Combination</option>
+  <option value = "skin_d">Dry</option>
+  <option value = "skin_n">Normal</option>
+  <option value = "skin_o">Oily</option>
+  <option value = "skin_s">Sensitive</option>
+</select>
+<button type="button">Search!</button>
+
+
+<svg id="recommendation" width="600" height="500">
+<!-- <rect x="0" y="0" width="85.70" height="288.55" fill="lightgrey"/> -->
+</svg>
+
+<script src="https://d3js.org/d3.v5.min.js"></script>
+
+
+<script>
+<!-- http://learnjsdata.com/read_data.html -->
+<!-- var svg = d3.select("svg"); -->
+var data = d3.csv("https://raw.githubusercontent.com/jjone36/Cosmetic/master/data/cosmetic_p.csv");
+data.then(function(data) {
+console.log(data[0]);
+})
+
+<!-- https://stackoverflow.com/questions/15987140/how-to-check-if-an-item-is-selected-from-an-html-drop-down-list -->
+function validate()
+{
+ var ddl = document.getElementById("products");
+ var selectedValue = ddl.options[ddl.selectedIndex].value;
+    if (selectedValue == "product_m")
+   {
+    alert("product_m");
+   }
+}
+
+</script>
+
+
 
