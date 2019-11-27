@@ -296,7 +296,13 @@ avg_brand
 
 
 # Product Recommendation
+<p> Choose the features of products you want, we will make recommendations for you!</p>
+<select>
+  <option value="o1">Moisturizer</option>
+  <option value="o2">Cleanser</option>
+  <option value="o3">Treatment</option>
+  <option value="o4">Face Mask</option>
+  <option value="o4">Eye Cream</option>
+  <option value="o4">Sun Protect</option>
+</select>
 
-<script>
-123123
-</script>
