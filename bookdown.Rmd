@@ -83,7 +83,7 @@ d <- rbind(combination, dry, normal, oily, sensitive)
 brand <- d %>% group_by(brand) %>% summarise(avg_price = sum(price)/n(),avg_rank = sum(rank)/n())
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = FALSE}
 avg_brand <- plot_ly(brand,
                      x=~avg_rank,
                      y=~avg_price,
