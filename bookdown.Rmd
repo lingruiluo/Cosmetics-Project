@@ -256,7 +256,7 @@ plot_ly(count_df, x = ~skin_type, y = ~moisturizer, type = 'bar', name = 'Moistu
             marker = list(color = '#61c0bf')) %>%
   add_trace(y = ~eye_cream, name = 'Eye Cream',
             marker = list(color = '#8fbaf3')) %>%
-  add_trace(y = ~sun_protect, name = 'Sum Protect',
+  add_trace(y = ~sun_protect, name = 'Sun Protect',
             marker = list(color = '#de95ba')) %>%
   layout(yaxis = list(title = 'Count'), barmode = 'group')
 ```
@@ -297,3 +297,6 @@ avg_brand
 
 # Product Recommendation
 
+<script>
+123123
+</script>
