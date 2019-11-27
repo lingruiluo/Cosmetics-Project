@@ -205,10 +205,60 @@ sensitive <- data %>% filter(data$Sensitive==1) %>%
 ```
 
 ```{r, echo = FALSE}
-num_prod_df = data.frame(skin_type = c("Normal", "Combination", "Oily", "Dry", "Sensitive"), num_product = c(nrow(normal), nrow(combination), nrow(oily),nrow(dry),nrow(sensitive)))
+skin_type <- c("combination", "dry", "normal", "oily", "sensitive")
+moisturizer <- c(length(combination$Label[combination$Label == 'Moisturizer']), 
+                 length(dry$Label[dry$Label == 'Moisturizer']),
+                 length(normal$Label[normal$Label == 'Moisturizer']),
+                 length(oily$Label[oily$Label == 'Moisturizer']),
+                 length(sensitive$Label[sensitive$Label == 'Moisturizer']))
 
-ggplot(data=num_prod_df, aes(x=skin_type, y=num_product)) +
-  geom_bar(stat="identity", width=0.5, fill = "#FF6666") + ggtitle("Number of Products for Each Skin Type") + xlab("Skin Type") + ylab("Number of Products")
+cleanser <- c(length(combination$Label[combination$Label == 'Cleanser']), 
+              length(dry$Label[dry$Label == 'Cleanser']),
+              length(normal$Label[normal$Label == 'Cleanser']),
+              length(oily$Label[oily$Label == 'Cleanser']),
+              length(sensitive$Label[sensitive$Label == 'Cleanser']))
+
+treatment <- c(length(combination$Label[combination$Label == 'Treatment']), 
+               length(dry$Label[dry$Label == 'Treatment']),
+               length(normal$Label[normal$Label == 'Treatment']),
+               length(oily$Label[oily$Label == 'Treatment']),
+               length(sensitive$Label[sensitive$Label == 'Treatment']))
+
+face_mask <- c(length(combination$Label[combination$Label == 'Face Mask']), 
+               length(dry$Label[dry$Label == 'Face Mask']),
+               length(normal$Label[normal$Label == 'Face Mask']),
+               length(oily$Label[oily$Label == 'Face Mask']),
+               length(sensitive$Label[sensitive$Label == 'Face Mask']))
+
+eye_cream <- c(length(combination$Label[combination$Label == 'Eye cream']), 
+               length(dry$Label[dry$Label == 'Eye cream']),
+               length(normal$Label[normal$Label == 'Eye cream']),
+               length(oily$Label[oily$Label == 'Eye cream']),
+               length(sensitive$Label[sensitive$Label == 'Eye cream']))
+
+sun_protect <- c(length(combination$Label[combination$Label == 'Sun protect']), 
+                 length(dry$Label[dry$Label == 'Sun protect']),
+                 length(normal$Label[normal$Label == 'Sun protect']),
+                 length(oily$Label[oily$Label == 'Sun protect']),
+                 length(sensitive$Label[sensitive$Label == 'Sun protect']))
+
+
+count_df = data.frame(skin_type, moisturizer, cleanser, treatment, face_mask, sun_protect)
+
+
+plot_ly(count_df, x = ~skin_type, y = ~moisturizer, type = 'bar', name = 'Moisturizer',
+        marker = list(color = '#ffb6b9')) %>%
+  add_trace(y = ~cleanser, name = 'Cleanser',
+            marker = list(color = '#fae3d9')) %>%
+  add_trace(y = ~treatment, name = 'Treatment',
+            marker = list(color = '#bbded6')) %>%
+  add_trace(y = ~face_mask, name = 'Face Mask',
+            marker = list(color = '#61c0bf')) %>%
+  add_trace(y = ~eye_cream, name = 'Eye Cream',
+            marker = list(color = '#8fbaf3')) %>%
+  add_trace(y = ~sun_protect, name = 'Sum Protect',
+            marker = list(color = '#de95ba')) %>%
+  layout(yaxis = list(title = 'Count'), barmode = 'group')
 ```
 
 There are most of products for the combination skin type while there are least for sensitive skin type.
