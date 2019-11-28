@@ -71,7 +71,6 @@ ingredients_func <- function(data, n) {
     arrange(desc(n)) %>% 
     rename(times = n))
 }
-
 ## yet to decide
 summary(data$price)
 low_price <- summary(data$price)[3]
@@ -79,13 +78,11 @@ medium_price <- summary(data$price)[4]
 low_data <- data %>% filter(price <= low_price) %>% select(ingredients)
 medium_data <- data %>% filter(price <= medium_price & price > low_price) %>% select(ingredients)
 high_data <- data %>% filter(price > medium_price) %>% select(ingredients)
-
 n <- 10
 df_all <- ingredients_func(data, n) %>% slice(1:n)
 df_low <- ingredients_func(low_data, n) %>% slice(1:n)
 df_medium <- ingredients_func(medium_data, n) %>% slice(1:n)
 df_high <- ingredients_func(high_data, n) %>% slice(1:n)
-
 df <- df_all %>% rename(OverallIngredients = ingredients) %>% select(-times) %>% 
                  inner_join(df_low %>% rename(LowPriceIngredients = ingredients) %>% select(-times)) %>% 
                  inner_join(df_medium %>% rename(MediumPriceIngredients = ingredients) %>% select(-times)) %>% 
@@ -104,7 +101,6 @@ n <- 100
 df_low <- ingredients_func(low_data, n) %>% slice(1:n)
 df_medium <- ingredients_func(medium_data, n) %>% slice(1:n)
 df_high <- ingredients_func(high_data, n) %>% slice(1:n)
-
 low_unique_ingredients <- setdiff(df_low$ingredients, union(df_medium$ingredients, df_high$ingredients))
 medium_unique_ingredients <- setdiff(df_medium$ingredients, union(df_low$ingredients, df_high$ingredients))
 high_unique_ingredients <- setdiff(df_high$ingredients, union(df_low$ingredients, df_medium$ingredients))
@@ -161,19 +157,15 @@ venn.diagram(
 combination <- data %>% filter(data$Combination==1) %>% 
   select(ingredients) %>%
   mutate(skin_type='Combination')
-
 dry <- data %>% filter(data$Dry==1) %>% 
   select(ingredients) %>%
   mutate(skin_type='Dry')
-
 normal <- data %>% filter(data$Normal==1) %>% 
   select(ingredients) %>%
   mutate(skin_type='Normal')
-
 oily <- data %>% filter(data$Oily==1) %>% 
   select(ingredients) %>%
   mutate(skin_type='Oily')
-
 sensitive <- data %>% filter(data$Sensitive==1) %>% 
   select(ingredients) %>%
   mutate(skin_type='Sensitive')
@@ -187,24 +179,19 @@ sensitive <- data %>% filter(data$Sensitive==1) %>%
 ```{r, echo = FALSE}
 # link <- "https://raw.githubusercontent.com/jjone36/Cosmetic/master/data/cosmetic_p.csv"
 # data <- read_csv(url(link))
-
 # data for each skin type
 combination <- data %>% filter(data$Combination==1) %>% 
   select(Label, brand, name, price, rank) %>%
   mutate(skin_type='Combination')
-
 dry <- data %>% filter(data$Dry==1) %>% 
   select(Label, brand, name, price, rank) %>% 
   mutate(skin_type='Dry')
-
 normal <- data %>% filter(data$Normal==1) %>% 
   select(Label, brand, name, price, rank) %>% 
   mutate(skin_type='Normal')
-
 oily <- data %>% filter(data$Oily==1) %>% 
   select(Label, brand, name, price, rank) %>%
   mutate(skin_type='Oily')
-
 sensitive <- data %>% filter(data$Sensitive==1) %>% 
   select(Label, brand, name, price, rank) %>%
   mutate(skin_type='Sensitive')
@@ -217,41 +204,32 @@ moisturizer <- c(length(combination$Label[combination$Label == 'Moisturizer']),
                  length(normal$Label[normal$Label == 'Moisturizer']),
                  length(oily$Label[oily$Label == 'Moisturizer']),
                  length(sensitive$Label[sensitive$Label == 'Moisturizer']))
-
 cleanser <- c(length(combination$Label[combination$Label == 'Cleanser']), 
               length(dry$Label[dry$Label == 'Cleanser']),
               length(normal$Label[normal$Label == 'Cleanser']),
               length(oily$Label[oily$Label == 'Cleanser']),
               length(sensitive$Label[sensitive$Label == 'Cleanser']))
-
 treatment <- c(length(combination$Label[combination$Label == 'Treatment']), 
                length(dry$Label[dry$Label == 'Treatment']),
                length(normal$Label[normal$Label == 'Treatment']),
                length(oily$Label[oily$Label == 'Treatment']),
                length(sensitive$Label[sensitive$Label == 'Treatment']))
-
 face_mask <- c(length(combination$Label[combination$Label == 'Face Mask']), 
                length(dry$Label[dry$Label == 'Face Mask']),
                length(normal$Label[normal$Label == 'Face Mask']),
                length(oily$Label[oily$Label == 'Face Mask']),
                length(sensitive$Label[sensitive$Label == 'Face Mask']))
-
 eye_cream <- c(length(combination$Label[combination$Label == 'Eye cream']), 
                length(dry$Label[dry$Label == 'Eye cream']),
                length(normal$Label[normal$Label == 'Eye cream']),
                length(oily$Label[oily$Label == 'Eye cream']),
                length(sensitive$Label[sensitive$Label == 'Eye cream']))
-
 sun_protect <- c(length(combination$Label[combination$Label == 'Sun protect']), 
                  length(dry$Label[dry$Label == 'Sun protect']),
                  length(normal$Label[normal$Label == 'Sun protect']),
                  length(oily$Label[oily$Label == 'Sun protect']),
                  length(sensitive$Label[sensitive$Label == 'Sun protect']))
-
-
 count_df = data.frame(skin_type, moisturizer, cleanser, treatment, face_mask, sun_protect)
-
-
 plot_ly(count_df, x = ~skin_type, y = ~moisturizer, type = 'bar', name = 'Moisturizer',
         marker = list(color = '#ffb6b9')) %>%
   add_trace(y = ~cleanser, name = 'Cleanser',
@@ -346,9 +324,15 @@ avg_brand
   <option value = "skin_o">75 - 100</option>
   <option value = "skin_s">100+</option>
 </select>
-
 <button id="search" type="button" style="font-family: Palatino;">Search!</button>
 
+
+<!-- To do: add text before the button. Change the position -->
+<select class = "sort">
+<option value="price-asc-rank">Price: Low to High</option>
+<option value="price-desc-rank">Price: High to Low</option>
+<option value="review-rank">Rank</option>
+</select>
 
 <script>
 document.getElementById("search").style.backgroundColor = "pink";;
