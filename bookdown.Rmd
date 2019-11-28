@@ -12,7 +12,13 @@ link-citations: yes
 # description: "This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook."
 ---
 
+
 # Introduction
+
+
+
+<!-- Copyright checked -->
+<img src = "front.jpeg" alt = "123" width = 1000 height = "500">
 
 It is always hard to choose what exact cosmetic product do you want and is suitable for you, so we are here to help! This book analyzes 1472 product of 6 types and 116 brands, You can easily get the information you want on the products you are interested in and compare them to other products. We also provide recommendations for you based on information you provided. Let's get started!^[The data is found in https://github.com/jjone36/Cosmetic/tree/master/data]
 
@@ -249,7 +255,7 @@ count_df = data.frame(skin_type, moisturizer, cleanser, treatment, face_mask, su
 plot_ly(count_df, x = ~skin_type, y = ~moisturizer, type = 'bar', name = 'Moisturizer',
         marker = list(color = '#ffb6b9')) %>%
   add_trace(y = ~cleanser, name = 'Cleanser',
-            marker = list(color = '#fae3d9')) %>%
+            marker = list(color = '#fae3d9'))%>%
   add_trace(y = ~treatment, name = 'Treatment',
             marker = list(color = '#bbded6')) %>%
   add_trace(y = ~face_mask, name = 'Face Mask',
@@ -300,9 +306,11 @@ avg_brand
 
 
 <p> Choose the features of products you want, we will make recommendations for you!</p>
+<!-- To do: Should be able to select multiple options. -->
+
 <!-- Products dropdown menu -->
 <select id = "products">
-  <option value = "product_select">Select product</option>
+  <option value = "product_select">Select Product</option>
   <option value = "product_m">Moisturizer</option>
   <option value = "product_c">Cleanser</option>
   <option value = "product_t">Treatment</option>
@@ -312,7 +320,7 @@ avg_brand
 </select>
 <!-- Skin type dropdown menu -->
 <select class = "skin_types">
-  <option value = "skin_select">Select skin</option>
+  <option value = "skin_select">Select Skin Type</option>
   <option value = "skin_c">Combination</option>
   <option value = "skin_d">Dry</option>
   <option value = "skin_n">Normal</option>
@@ -320,22 +328,31 @@ avg_brand
   <option value = "skin_s">Sensitive</option>
 </select>
 <!-- Rank dropdown menu -->
-<select class = "skin_types">
-  <option value = "skin_c">Combination</option>
-  <option value = "skin_d">Dry</option>
-  <option value = "skin_n">Normal</option>
-  <option value = "skin_o">Oily</option>
-  <option value = "skin_s">Sensitive</option>
+<!-- To do: add stars  -->
+<select class = "ranks">
+  <option value = "rank_select">Select Rank</option>
+  <option value = "rank_0">Below 1</option>
+  <option value = "rank_1">1 - 2</option>
+  <option value = "rank_2">2 - 3</option>
+  <option value = "rank_3">3 - 4</option>
+  <option value = "rank_4">Above 4</option>
 </select>
 <!-- Price dropdown menu -->
-<select class = "skin_types">
-  <option value = "skin_c">Combination</option>
-  <option value = "skin_d">Dry</option>
-  <option value = "skin_n">Normal</option>
-  <option value = "skin_o">Oily</option>
-  <option value = "skin_s">Sensitive</option>
+<select class = "prices">
+  <option value = "price_select">Select Price</option>
+  <option value = "skin_c">Below 25</option>
+  <option value = "skin_d">25 - 50</option>
+  <option value = "skin_n">50 - 75</option>
+  <option value = "skin_o">75 - 100</option>
+  <option value = "skin_s">100+</option>
 </select>
-<button type="button">Search!</button>
+
+<button id="search" type="button" style="font-family: Palatino;">Search!</button>
+
+
+<script>
+document.getElementById("search").style.backgroundColor = "pink";;
+</script>
 
 
 <svg id="recommendation" width="600" height="500">
@@ -365,6 +382,3 @@ function validate()
 }
 
 </script>
-
-
-
