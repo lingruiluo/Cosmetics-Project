@@ -174,7 +174,9 @@ sensitive <- data %>% filter(data$Sensitive==1) %>%
 
 # Skin Type
 
-## Number of Product for Each Skin Type
+Curious about the differences between products of different skin types? Look at the following graphs and explanations!
+
+## Number of Products for Each Skin Type
 
 ```{r, echo = FALSE}
 # link <- "https://raw.githubusercontent.com/jjone36/Cosmetic/master/data/cosmetic_p.csv"
@@ -199,59 +201,123 @@ sensitive <- data %>% filter(data$Sensitive==1) %>%
 
 ```{r, echo = FALSE}
 skin_type <- c("combination", "dry", "normal", "oily", "sensitive")
-moisturizer <- c(length(combination$Label[combination$Label == 'Moisturizer']), 
+moisturizer_count <- c(length(combination$Label[combination$Label == 'Moisturizer']), 
                  length(dry$Label[dry$Label == 'Moisturizer']),
                  length(normal$Label[normal$Label == 'Moisturizer']),
                  length(oily$Label[oily$Label == 'Moisturizer']),
                  length(sensitive$Label[sensitive$Label == 'Moisturizer']))
-cleanser <- c(length(combination$Label[combination$Label == 'Cleanser']), 
+cleanser_count <- c(length(combination$Label[combination$Label == 'Cleanser']), 
               length(dry$Label[dry$Label == 'Cleanser']),
               length(normal$Label[normal$Label == 'Cleanser']),
               length(oily$Label[oily$Label == 'Cleanser']),
               length(sensitive$Label[sensitive$Label == 'Cleanser']))
-treatment <- c(length(combination$Label[combination$Label == 'Treatment']), 
+treatment_count <- c(length(combination$Label[combination$Label == 'Treatment']), 
                length(dry$Label[dry$Label == 'Treatment']),
                length(normal$Label[normal$Label == 'Treatment']),
                length(oily$Label[oily$Label == 'Treatment']),
                length(sensitive$Label[sensitive$Label == 'Treatment']))
-face_mask <- c(length(combination$Label[combination$Label == 'Face Mask']), 
+face_mask_count <- c(length(combination$Label[combination$Label == 'Face Mask']), 
                length(dry$Label[dry$Label == 'Face Mask']),
                length(normal$Label[normal$Label == 'Face Mask']),
                length(oily$Label[oily$Label == 'Face Mask']),
                length(sensitive$Label[sensitive$Label == 'Face Mask']))
-eye_cream <- c(length(combination$Label[combination$Label == 'Eye cream']), 
+eye_cream_count <- c(length(combination$Label[combination$Label == 'Eye cream']), 
                length(dry$Label[dry$Label == 'Eye cream']),
                length(normal$Label[normal$Label == 'Eye cream']),
                length(oily$Label[oily$Label == 'Eye cream']),
                length(sensitive$Label[sensitive$Label == 'Eye cream']))
-sun_protect <- c(length(combination$Label[combination$Label == 'Sun protect']), 
+sun_protect_count <- c(length(combination$Label[combination$Label == 'Sun protect']), 
                  length(dry$Label[dry$Label == 'Sun protect']),
                  length(normal$Label[normal$Label == 'Sun protect']),
                  length(oily$Label[oily$Label == 'Sun protect']),
                  length(sensitive$Label[sensitive$Label == 'Sun protect']))
-count_df = data.frame(skin_type, moisturizer, cleanser, treatment, face_mask, sun_protect)
-plot_ly(count_df, x = ~skin_type, y = ~moisturizer, type = 'bar', name = 'Moisturizer',
+count_df = data.frame(skin_type, moisturizer_count, cleanser_count, treatment_count, face_mask_count, sun_protect_count)
+plot_ly(count_df, x = ~skin_type, y = ~moisturizer_count, type = 'bar', name = 'Moisturizer',
         marker = list(color = '#ffb6b9')) %>%
-  add_trace(y = ~cleanser, name = 'Cleanser',
+  add_trace(y = ~cleanser_count, name = 'Cleanser',
             marker = list(color = '#fae3d9'))%>%
-  add_trace(y = ~treatment, name = 'Treatment',
+  add_trace(y = ~treatment_count, name = 'Treatment',
             marker = list(color = '#bbded6')) %>%
-  add_trace(y = ~face_mask, name = 'Face Mask',
+  add_trace(y = ~face_mask_count, name = 'Face Mask',
             marker = list(color = '#61c0bf')) %>%
-  add_trace(y = ~eye_cream, name = 'Eye Cream',
+  add_trace(y = ~eye_cream_count, name = 'Eye Cream',
             marker = list(color = '#8fbaf3')) %>%
-  add_trace(y = ~sun_protect, name = 'Sun Protect',
+  add_trace(y = ~sun_protect_count, name = 'Sun Protect',
             marker = list(color = '#de95ba')) %>%
   layout(yaxis = list(title = 'Count'), barmode = 'group')
 ```
 
-There are most of products for the combination skin type while there are least for sensitive skin type.
+There aren't many differences between the number of products for each skin type. However, there are generally less products for sensitive skins!
 
-To do: Add description of the plot
+
 
 ## Price Differences for Each Skin Type
 
-# Price vs. Rank
+```{r, echo = FALSE}
+skin_type <- c("combination", "dry", "normal", "oily", "sensitive")
+
+moisturizer_price <- c(mean(combination$price[combination$Label == 'Moisturizer']), 
+                 mean(dry$price[dry$Label == 'Moisturizer']),
+                 mean(normal$price[normal$Label == 'Moisturizer']),
+                 mean(oily$price[oily$Label == 'Moisturizer']),
+                 mean(sensitive$price[sensitive$Label == 'Moisturizer']))
+
+cleanser_price <- c(mean(combination$price[combination$Label == 'Cleanser']), 
+              mean(dry$price[dry$Label == 'Cleanser']),
+              mean(normal$price[normal$Label == 'Cleanser']),
+              mean(oily$price[oily$Label == 'Cleanser']),
+              mean(sensitive$price[sensitive$Label == 'Cleanser']))
+
+treatment_price <- c(mean(combination$price[combination$Label == 'Treatment']), 
+               mean(dry$price[dry$Label == 'Treatment']),
+               mean(normal$price[normal$Label == 'Treatment']),
+               mean(oily$price[oily$Label == 'Treatment']),
+               mean(sensitive$price[sensitive$Label == 'Treatment']))
+
+face_mask_price <- c(mean(combination$price[combination$Label == 'Face Mask']), 
+               mean(dry$price[dry$Label == 'Face Mask']),
+               mean(normal$price[normal$Label == 'Face Mask']),
+               mean(oily$price[oily$Label == 'Face Mask']),
+               mean(sensitive$price[sensitive$Label == 'Face Mask']))
+
+eye_cream_price <- c(mean(combination$price[combination$Label == 'Eye cream']), 
+               mean(dry$price[dry$Label == 'Eye cream']),
+               mean(normal$price[normal$Label == 'Eye cream']),
+               mean(oily$price[oily$Label == 'Eye cream']),
+               mean(sensitive$price[sensitive$Label == 'Eye cream']))
+
+sun_protect_price <- c(mean(combination$price[combination$Label == 'Sun protect']), 
+                 mean(dry$price[dry$Label == 'Sun protect']),
+                 mean(normal$price[normal$Label == 'Sun protect']),
+                 mean(oily$price[oily$Label == 'Sun protect']),
+                 mean(sensitive$price[sensitive$Label == 'Sun protect']))
+avg_price_df = data.frame(skin_type, moisturizer_price, cleanser_price, treatment_price, face_mask_price, sun_protect_price)
+
+
+plot_ly(avg_price_df, x = ~skin_type, 
+        y = ~moisturizer_price, 
+        type = 'bar', 
+        name = 'Moisturizer',
+        marker = list(color = '#ffb6b9')) %>%
+  add_trace(y = ~cleanser_price, name = 'Cleanser',
+            marker = list(color = '#fae3d9'))%>%
+  add_trace(y = ~treatment_price, name = 'Treatment',
+            marker = list(color = '#bbded6')) %>%
+  add_trace(y = ~face_mask_price, name = 'Face Mask',
+            marker = list(color = '#61c0bf')) %>%
+  add_trace(y = ~eye_cream_price, name = 'Eye Cream',
+            marker = list(color = '#8fbaf3')) %>%
+  add_trace(y = ~sun_protect_price, name = 'Sun Protect',
+            marker = list(color = '#de95ba')) %>%
+  layout(yaxis = list(title = 'Count'), barmode = 'group')
+```
+
+There aren't much difference in prices for each skin type!
+
+# Rank
+
+
+## Price vs. Rank
 
 ```{r, echo = FALSE}
 d <- rbind(combination, dry, normal, oily, sensitive) 
@@ -278,6 +344,33 @@ avg_brand <- plot_ly(brand,
 avg_brand
 ```
 
+## Brand v.s. Rank
+
+Which brands have the highest average rank?
+
+```{r}
+brand_rank <- data.frame(data, stringsAsFactors = FALSE) %>%
+  select(brand, rank) %>%
+  group_by(brand) %>% summarise(rank = mean(rank)) %>%
+  arrange(desc(rank)) %>%
+  head(15)
+
+brand_rank$brand <- factor(brand_rank$brand, levels = unique(brand_rank$brand)[order(brand_rank$rank)])
+
+
+plot_ly(brand_rank, x = ~rank, y = ~brand, type = 'scatter',
+             mode = "markers", marker = list(color = "fa697c")) %>%
+  layout(
+    title = "Top 15 Ranked Brands",
+    titlefont = list(
+           family = "Agency FB"),
+    xaxis = list(title = "Average Rank"),
+    margin = list(l = 100),
+         font = list(
+           family = "Agency FB")
+  )
+```
+
 
 # Product Recommendation
 
@@ -288,7 +381,7 @@ avg_brand
 
 <!-- Products dropdown menu -->
 <select id = "products">
-  <option value = "product_select">Select Product</option>
+  <option value = "product_select">Select Product Type</option>
   <option value = "product_m">Moisturizer</option>
   <option value = "product_c">Cleanser</option>
   <option value = "product_t">Treatment</option>
@@ -328,14 +421,18 @@ avg_brand
 
 
 <!-- To do: add text before the button. Change the position -->
-<select class = "sort">
+
+<span>Sort By</span>
+<select id = "sort" onchange = "EnableDisableTextBox(this)">
 <option value="price-asc-rank">Price: Low to High</option>
 <option value="price-desc-rank">Price: High to Low</option>
 <option value="review-rank">Rank</option>
+<option value="brand-name">Brand Name</option>
 </select>
 
 <script>
-document.getElementById("search").style.backgroundColor = "pink";;
+document.getElementById("search").style.backgroundColor = "pink";
+document.getElementById("sort").style.position = "sticky";
 </script>
 
 
