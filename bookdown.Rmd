@@ -88,7 +88,45 @@ df <- df_all %>% rename(OverallIngredients = ingredients) %>% select(-times) %>%
                  inner_join(df_medium %>% rename(MediumPriceIngredients = ingredients) %>% select(-times)) %>% 
                  inner_join(df_high %>% rename(HighPriceIngredients = ingredients) %>% select(-times)) %>% 
                  select(Top, everything())
-knitr::kable(df)
+knitr::kable(df,
+             caption = 'Top 10 Ingredients in Products with Low, Medium, High Price')
+```
+
+Next, we would also like to explore Top 10 ingredients in products for different skin types. The following table gives an overall sense of ingredients for each skin types. 
+
+```{r echo=FALSE, warning=FALSE}
+# skin type
+combination <- data %>% filter(data$Combination==1) %>% 
+  select(ingredients) %>%
+  mutate(skin_type='Combination')
+dry <- data %>% filter(data$Dry==1) %>% 
+  select(ingredients) %>%
+  mutate(skin_type='Dry')
+normal <- data %>% filter(data$Normal==1) %>% 
+  select(ingredients) %>%
+  mutate(skin_type='Normal')
+oily <- data %>% filter(data$Oily==1) %>% 
+  select(ingredients) %>%
+  mutate(skin_type='Oily')
+sensitive <- data %>% filter(data$Sensitive==1) %>% 
+  select(ingredients) %>%
+  mutate(skin_type='Sensitive')
+```
+```{r fig.width=6, echo=FALSE, warning=FALSE, message=FALSE}
+com_df <- ingredients_func(combination, 10) %>% slice(1:10)
+dry_df <- ingredients_func(dry, 10) %>% slice(1:10)
+nor_df <- ingredients_func(normal, 10) %>% slice(1:10)
+oil_df <- ingredients_func(oily, 10) %>% slice(1:10)
+sen_df <- ingredients_func(sensitive, 10) %>% slice(1:10)
+skin_df <- com_df %>% rename(Combination = ingredients) %>% select(-times) %>% 
+                 inner_join(dry_df %>% rename(Dry = ingredients) %>% select(-times)) %>% 
+  inner_join(oil_df %>% rename(Oily = ingredients) %>% select(-times)) %>%
+                 inner_join(nor_df %>% rename(Normal = ingredients) %>% select(-times)) %>% 
+  inner_join(sen_df %>% rename(Sensitive = ingredients) %>% select(-times)) %>%
+                 select(Top, everything())
+knitr::kable(skin_df,"html",
+             caption = 'Top 10 Ingredients in Products for Each Skin Types') %>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = T,position = "center") 
 ```
 
 ## Unique Ingredients in Products
@@ -106,10 +144,15 @@ medium_unique_ingredients <- setdiff(df_medium$ingredients, union(df_low$ingredi
 high_unique_ingredients <- setdiff(df_high$ingredients, union(df_low$ingredients, df_medium$ingredients))
 ```
 
-```{r echo=FALSE}
-low_unique_ingredients
-medium_unique_ingredients
-high_unique_ingredients
+```{r echo=FALSE, warning=FALSE}
+knitr::kable(
+  list(
+  data.frame(low_unique_ingredients) %>% rename("Unique Ingredients with Low Price"=low_unique_ingredients),
+  data.frame(medium_unique_ingredients) %>% rename("Unique Ingredients with Medium Price"=medium_unique_ingredients),
+  data.frame(high_unique_ingredients) %>% rename("Unique Ingredients with High Price"=high_unique_ingredients)),
+  caption = 'The Unique Ingredients in Products with Low, Medium, High Price'
+  ) %>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = F)
 ```
 
 
@@ -152,23 +195,79 @@ venn.diagram(
 )
 ```
 
-```{r}
-# need to fix
-combination <- data %>% filter(data$Combination==1) %>% 
-  select(ingredients) %>%
-  mutate(skin_type='Combination')
-dry <- data %>% filter(data$Dry==1) %>% 
-  select(ingredients) %>%
-  mutate(skin_type='Dry')
-normal <- data %>% filter(data$Normal==1) %>% 
-  select(ingredients) %>%
-  mutate(skin_type='Normal')
-oily <- data %>% filter(data$Oily==1) %>% 
-  select(ingredients) %>%
-  mutate(skin_type='Oily')
-sensitive <- data %>% filter(data$Sensitive==1) %>% 
-  select(ingredients) %>%
-  mutate(skin_type='Sensitive')
+```{r echo=FALSE, warning=FALSE}
+#skin type
+n <- 100
+c_udf <- ingredients_func(combination, n) %>% slice(1:n)
+d_udf <- ingredients_func(dry, n) %>% slice(1:n)
+n_udf <- ingredients_func(normal, n) %>% slice(1:n)
+o_udf <- ingredients_func(oily, n) %>% slice(1:n)
+s_udf <- ingredients_func(sensitive, n) %>% slice(1:n)
+com_unique_ingredients <- setdiff(c_udf$ingredients, union(union(d_udf$ingredients, n_udf$ingredients),union(o_udf$ingredients,s_udf$ingredients)))
+dry_unique_ingredients <- setdiff(d_udf$ingredients, union(union(c_udf$ingredients, n_udf$ingredients),union(o_udf$ingredients,s_udf$ingredients)))
+normal_unique_ingredients <- setdiff(n_udf$ingredients, union(union(c_udf$ingredients, d_udf$ingredients),union(o_udf$ingredients,s_udf$ingredients)))
+oily_unique_ingredients <- setdiff(o_udf$ingredients, union(union(c_udf$ingredients, d_udf$ingredients),union(n_udf$ingredients,s_udf$ingredients)))
+sensitive_unique_ingredients <- setdiff(s_udf$ingredients, union(union(c_udf$ingredients, d_udf$ingredients),union(n_udf$ingredients,o_udf$ingredients)))
+```
+```{r eval=FALSE, include=FALSE}
+venn.plot <- draw.quintuple.venn(
+      area1 = 100,
+      area2 = 100,
+      area3 = 100,
+      area4 = 100,
+      area5 = 100,
+      n12 = length(intersect(c_udf$ingredients, d_udf$ingredients)),
+      n13 = length(intersect(c_udf$ingredients, n_udf$ingredients)),
+      n14 = length(intersect(c_udf$ingredients, o_udf$ingredients)),
+      n15 = length(intersect(c_udf$ingredients, s_udf$ingredients)),
+      n23 = length(intersect(d_udf$ingredients, n_udf$ingredients)),
+      n24 = length(intersect(d_udf$ingredients, o_udf$ingredients)),
+      n25 = length(intersect(d_udf$ingredients, s_udf$ingredients)),
+      n34 = length(intersect(n_udf$ingredients, o_udf$ingredients)),
+      n35 = length(intersect(n_udf$ingredients, s_udf$ingredients)),
+      n45 = length(intersect(o_udf$ingredients, s_udf$ingredients)),
+      n123 = length(intersect(intersect(c_udf$ingredients, d_udf$ingredients),n_udf$ingredients)),
+      n124 = length(intersect(intersect(c_udf$ingredients, d_udf$ingredients),o_udf$ingredients)),
+      n125 = length(intersect(intersect(c_udf$ingredients, d_udf$ingredients),s_udf$ingredients)),
+      n134 = length(intersect(intersect(c_udf$ingredients, n_udf$ingredients),o_udf$ingredients)),
+      n135 = length(intersect(intersect(c_udf$ingredients, n_udf$ingredients),s_udf$ingredients)),
+      n145 = length(intersect(intersect(c_udf$ingredients, o_udf$ingredients),s_udf$ingredients)),
+      n234 = length(intersect(intersect(d_udf$ingredients, n_udf$ingredients),o_udf$ingredients)),
+      n235 = length(intersect(intersect(d_udf$ingredients, n_udf$ingredients),s_udf$ingredients)),
+      n245 = length(intersect(intersect(d_udf$ingredients, o_udf$ingredients),s_udf$ingredients)),
+      n345 = length(intersect(intersect(n_udf$ingredients, o_udf$ingredients),s_udf$ingredients)),
+      n1234 = length(intersect(intersect(c_udf$ingredients, d_udf$ingredients),intersect(n_udf$ingredients,o_udf$ingredients))),
+      n1235 = length(intersect(intersect(c_udf$ingredients, d_udf$ingredients),intersect(n_udf$ingredients,s_udf$ingredients))),
+      n1245 = length(intersect(intersect(c_udf$ingredients, d_udf$ingredients),intersect(o_udf$ingredients,s_udf$ingredients))),
+      n1345 = length(intersect(intersect(c_udf$ingredients, n_udf$ingredients),intersect(o_udf$ingredients,s_udf$ingredients))),
+      n2345 = length(intersect(intersect(d_udf$ingredients, n_udf$ingredients),intersect(o_udf$ingredients,s_udf$ingredients))),
+      n12345 = length(intersect(intersect(intersect(c_udf$ingredients, d_udf$ingredients),intersect(n_udf$ingredients,o_udf$ingredients)),s_udf$ingredients)),
+      category = c("Combination", "Dry", "Normal", "Oily","Sensitive"),
+      fill = brewer.pal(5, "Pastel2"),
+      cex = 1,
+      margin = 0.05,
+      cat.cex = 1,
+      cat.col = "black",
+      ind = TRUE
+)
+png(filename="skin_venn_diagram.png")
+grid.draw(venn.plot)
+dev.off()
+```
+
+![Skin Type Unique Ingredient Venn Diagram](skin_venn_diagram.png)
+
+```{r echo=FALSE,warning=FALSE}
+knitr::kable(
+  list(
+  data.frame(com_unique_ingredients) %>% rename("Unique Ingredients for Combination"=com_unique_ingredients),
+  data.frame(dry_unique_ingredients) %>% rename("Unique Ingredients for Dry"=dry_unique_ingredients),
+  data.frame(normal_unique_ingredients) %>% rename("Unique Ingredients for Normal"=normal_unique_ingredients),
+  data.frame(oily_unique_ingredients) %>% rename("Unique Ingredients for Oily"=oily_unique_ingredients),
+  data.frame(sensitive_unique_ingredients) %>% rename("Unique Ingredients for Sensitive"=sensitive_unique_ingredients)),
+  caption = 'The Unique Ingredients in Products for Each Skin Type'
+  ) %>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = F)
 ```
 
 
@@ -248,7 +347,6 @@ plot_ly(count_df, x = ~skin_type, y = ~moisturizer_count, type = 'bar', name = '
 ```
 
 There aren't many differences between the number of products for each skin type. However, there are generally less products for sensitive skins!
-
 
 
 ## Price Differences for Each Skin Type
